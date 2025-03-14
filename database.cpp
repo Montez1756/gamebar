@@ -334,37 +334,3 @@ bool database::update(const std::string &tableName, const std::map<std::string, 
 std::vector<std::unique_ptr<table>> &database::getTables(){
     return tables;
 }
-
-int main()
-{
-    database db("database/games.db");
-    if (!db.existed)
-    {
-        std::string createTableQuery = R"(
-            CREATE TABLE IF NOT EXISTS launchers (
-                name TEXT NOT NULL,
-                gamesPath TEXT NOT NULL
-            );
-        )";
-        db.createTable("launchers", createTableQuery);
-        createTableQuery = R"(
-            CREATE TABLE IF NOT EXISTS games (
-                launcher TEXT NOT NULL,
-                exe TEXT NOT NULL,
-                icon TEXT,
-                lastPlayed INT
-            );
-        )";
-        db.createTable("games", createTableQuery);
-    }
-    else
-    {
-        db.loadTable("launchers");
-        db.loadTable("games");
-    }
-    // Create the table
-    for(const auto &t: db.getTables()){
-        t.get()->print();
-    }
-    return 0;
-}
