@@ -15,7 +15,6 @@ gamebargui::gamebargui() : QMainWindow()
 
     barLayout = new QVBoxLayout(centralWidget);
 
-
     setGeometry(screenSize.width(), 0, screenSize.width() / 3, screenSize.height() / 3);
     setStyleSheet("background-color:rgba(0,0,0,0.3); border-radius:10;");
     setWindowFlags(Qt::Tool);
@@ -28,5 +27,10 @@ gamebargui::~gamebargui()
 {
 }
 
+Button::Button(QWidget *parent, QIcon icon) : QPushButton(icon, "", parent), objectParent(parent)
+{
+}
 
-Button::Button(QWidget *parent, QIcon icon) : QPushButton()
+Button::Button(QWidget *parent, QIcon icon, const std::string &text) : QPushButton(icon, text, parent), objectParent(parent)
+{
+}
