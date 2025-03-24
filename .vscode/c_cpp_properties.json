@@ -4,10 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/qt5/QtWidgets",
-                "/usr/include/qt5",
-                "/usr/include/qt5/QtGui",
-                "/usr/include/"
+                "${workspaceFolder}/json/include"
             ],
             "defines": [],
             "cStandard": "c17",

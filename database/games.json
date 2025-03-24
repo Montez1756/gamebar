@@ -1,0 +1,13 @@
+{
+    "games": [],
+    "launchers": [
+        {
+            "name": "steam",
+            "path": "C:/Program Files(x86)/Steam"
+        },
+        {
+            "name":"epic games",
+            "path":"C:/Program Files/Epic Games"
+        }
+    ]
+}
