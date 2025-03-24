@@ -4,7 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/json/include"
+                "${workspaceFolder}/json/include",
+                "/usr/include/qt5/QtNetwork",
+                "/usr/include/qt5/QtCore",
+                "/usr/include/qt5"
             ],
             "defines": [],
             "cStandard": "c17",
