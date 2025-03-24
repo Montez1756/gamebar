@@ -16,6 +16,7 @@ public:
 
     void get(const QUrl &url, const QVariantMap &headers = {});
     void post(const QUrl &url, const QVariantMap &data, const QVariantMap &headers = {});
+    QByteArray getBlocking(const QUrl &url, const QVariantMap &headers = {}, int timeoutMs = 5000);
 
 signals:
     void responseReceived(const QByteArray &data);

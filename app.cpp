@@ -24,8 +24,6 @@ bool App::checkForUpate()
     HttpClient client;
     std::string remoteVersion = client.getBlocking(QUrl("https://example.com/version.txt")).toStdString();
     
-
-
     std::vector<int> local, remote;
     std::stringstream lstream(localVersion), rstream(remoteVersion);
     std::string part;

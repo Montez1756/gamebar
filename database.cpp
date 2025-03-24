@@ -106,6 +106,10 @@ void Database::extractSteamGames(const fs::path &launcherPath)
     }
 }
 
+json &Database::getData(){
+    return data;
+}
+
 int main()
 {
     Database db("database/games.json");
@@ -130,5 +134,6 @@ int main()
             db.extractAllGames();
         }
     }
+    
     return 0;
 }
