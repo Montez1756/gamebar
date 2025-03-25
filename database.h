@@ -15,11 +15,11 @@ class Database
 private:
     json data;
     std::string path;
-    void extractEpicGames(const fs::path &launcherPath);
     void extractSteamGames(const fs::path &launcherPath);
+    void extractEpicGames(const fs::path &launcherPath);
+    void extractEAGames(const fs::path &launcherPath);
     void extractUbisoftGames(const fs::path &launcherPath);
     void extractGOGGames(const fs::path &launcherPath);
-    void extractEAGames(const fs::path &launcherPath);
     void save();
     using gameMethod = void (Database::*)(const fs::path&);
     std::map<std::string, gameMethod> launcherMethods;

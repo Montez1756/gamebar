@@ -8,7 +8,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "main.cpp",
                 "database.cpp",
                 "-I${workspaceFolder}/json/include",
                 "-L/usr/lib64",
@@ -42,7 +42,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "main.cpp",
                 "database.cpp",
                 "-I${workspaceFolder}/json/include",
                 "-LC:/msys64/mingw64/lib",

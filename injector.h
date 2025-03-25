@@ -5,7 +5,6 @@
 #include "platform.h"
 #include <iostream>
 #include <fstream>
-#include <cstring>
 
 #if os == 0
 #include <windows.h>
@@ -23,9 +22,9 @@
 #include <mach/mach.h>
 #endif
 
-#ifndef DWORD
-typedef unsigned long DWORD;
-#endif
+// #ifndef DWORD
+// typedef unsigned long DWORD;
+// #endif
 class Injector
 {
 private:

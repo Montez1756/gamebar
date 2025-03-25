@@ -7,8 +7,31 @@
 #include <nlohmann/json.hpp>
 #include "platform.h"
 #include <filesystem>
+#include <cstdlib>
 
 namespace fs = std::filesystem;
+
+void run(json &j, std::string gameName)
+{
+    for (const auto game : j["games"])
+    {
+        if (game["name"] == gameName)
+        {
+            std::string launchCommand = j["launchers"][platform][game["launcher"]]["launch_cmd"];
+            size_t pos = launchCommand.find("{id}");
+            if (pos != std::string::npos)
+            {
+                launchCommand.replace(pos, 4, game["id"]);
+                system(launchCommand.c_str());
+                return;
+            }
+        }
+        else
+        {
+        }
+    }
+    std::cerr << "Could not find game " << gameName << std::endl;
+}
 
 int main()
 {
@@ -38,35 +61,55 @@ int main()
     {
         lines.push_back("os:" + platform);
         json j = db.getData();
-        for(const auto launcher: j["launchers"][platform]["launchers"])
+        for (auto &[launcherName, launcherConfig] : j["launchers"][platform].items())
         {
-            if(fs::exists(launcher["path"])){
-                std::string launcherConfig = launcher["name"].dump() + ":" + launcher["path"].dump();
-                lines.push_back(launcherConfig);
+            std::cout << launcherName << std::endl;
+            std::cout << launcherConfig.dump() << std::endl;
+            std::string path = launcherConfig["path"];
+            if (fs::exists(path))
+            {
+                std::string launcherLine = launcherName + ":" + path;
+                lines.push_back(launcherLine);
             }
         }
-        lines[0] = "first:true";
+        // lines[0] = "first:true";
         std::ofstream configFile("config.txt");
-        if(!configFile.is_open())
+        if (!configFile.is_open())
         {
             std::cerr << "Warning: Failed to open config.txt" << std::endl;
             return -1;
         }
-        for(const auto &line: lines)
+        for (const auto &line : lines)
         {
             configFile << line << "\n";
         }
         configFile.close();
 
-
         db.extractAllGames();
     }
-    
+
     json j = db.getData();
-    std::cout << platform << std::endl;
-    if(j["games"].empty())
+
+    if (j["games"].empty())
     {
         std::cerr << "No games found from launchers" << std::endl;
     }
+    while (true)
+    {
+        std::string input;
+
+        std::cout << "Enter game name: " << std::endl;
+        std::getline(std::cin, input);
+        if (input == "q")
+        {
+            return 0;
+        }
+        else
+        {
+            run(j, input);
+        }
+        // inZOI: Creative Studio
+    }
+
     return 0;
 }

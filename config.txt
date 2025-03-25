@@ -1,1 +1,7 @@
-first:true
+first:false
+os:windows
+epic games:C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests
+steam:C:\Program Files (x86)\Steam\steamapps
+os:windows
+epic games:C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests
+steam:C:\Program Files (x86)\Steam\steamapps

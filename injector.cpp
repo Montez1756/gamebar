@@ -21,17 +21,16 @@
 #include <mach/mach.h>
 #endif
 
-#ifndef DWORD
-typedef unsigned long DWORD;
-#endif
-
+// #ifndef DWORD
+// typedef unsigned long DWORD;
+// #endif
 
 Injector::Injector(const std::string &applicationName, const std::string &dllPath)
 {
     InjectDLL(GetProcessIDByName(applicationName.c_str()), dllPath.c_str());
 }
 #if os == 0
-DWORD Injector::GetProcesIDByName(const char *processName)
+DWORD Injector::GetProcessIDByName(const char *processName)
 {
     DWORD pid = 0;
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -39,7 +38,7 @@ DWORD Injector::GetProcesIDByName(const char *processName)
         return 0;
 
     PROCESSENTRY32 pe;
-    pe.dwSize = sizeof(PROCESENTRY32);
+    pe.dwSize = sizeof(PROCESSENTRY32);
     if (Process32First(hSnap, &pe))
     {
         do
@@ -57,21 +56,21 @@ DWORD Injector::GetProcesIDByName(const char *processName)
 bool Injector::InjectDLL(DWORD processID, const char *dllPath)
 {
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
-    if(!hProcess)
+    if (!hProcess)
     {
         std::cerr << "Failed to open process: " << processID << std::endl;
         return false;
     }
 
     LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, strlen(dllPath));
-    if(!allocMem)
+    if (!allocMem)
     {
         std::cerr << "Memory allocation failed." << std::endl;
         CloseHandle(hProcess);
         return false;
     }
 
-    if(!WriteProcessMemory(hProcess, allocMem, dllPath, strlen(dllPath) + 1, nullptr))
+    if (!WriteProcessMemory(hProcess, allocMem, dllPath, strlen(dllPath) + 1, nullptr))
     {
         std::cerr << "Failed to write memory" << std::endl;
         VirutalFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
@@ -80,7 +79,7 @@ bool Injector::InjectDLL(DWORD processID, const char *dllPath)
     }
 
     HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA"), allocMem, 0, nullptr);
-    if(!hThread)
+    if (!hThread)
     {
         std::cerr << "Failed to create remote thread" << std::endl;
         VirutalFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
@@ -125,7 +124,7 @@ pid_t Injector::GetProcessIDByName(const char *processName)
 
 bool Injector::InjectDLL(pid_t processID, const char *dllPath)
 {
-    if(ptrace(PTRACE_ATTACH, processID, nullptr, nullptr) == -1)
+    if (ptrace(PTRACE_ATTACH, processID, nullptr, nullptr) == -1)
     {
         perror("ptrace attach");
         return false;
@@ -134,11 +133,11 @@ bool Injector::InjectDLL(pid_t processID, const char *dllPath)
     waitpid(processID, nullptr, 0);
 
     void *handle = dlopen(dllPath, RTLD_NOW);
-    if(!handle)
+    if (!handle)
     {
         std::cerr << "Failed to load shared object: " << dllPath << std::endl;
         ptrace(PTRACE_DETACH, processID, nullptr, nullptr);
-        return false; 
+        return false;
     }
 
     ptrace(PTRACE_DETACH, processID, nullptr, nullptr);
@@ -172,21 +171,23 @@ pid_t Injector::GetProcessIDByName(const char *processName)
     free(procs);
     return 0;
 }
-bool Injector::InjectDLL(pid_t processID, const char *dylibPath){
+bool Injector::InjectDLL(pid_t processID, const char *dylibPath)
+{
     task_t task;
-    if(task_for_pid(mach_task_self(), pid, &task) != KERN_SUCCESS)
+    if (task_for_pid(mach_task_self(), pid, &task) != KERN_SUCCESS)
     {
         std::cerr << "Failed to get task for process: " << processID << std::endl;
         return false;
     }
 
     mach_vm_address_t remoteMemory;
-    if(mach_vm_allocate(task, &remoteMemory, strlen(dylibPath) + 1, VM_FLAGS_ANYWHERE) != KERN_SUCCESS){
+    if (mach_vm_allocate(task, &remoteMemory, strlen(dylibPath) + 1, VM_FLAGS_ANYWHERE) != KERN_SUCCESS)
+    {
         std::cerr << "Memory allocation failed" << std::endl;
-        return false; 
+        return false;
     }
 
-    if(mach_vm_write(task, remoteMemory, (vm_offset_t)dylibPath, (mach_msg_type_number_t)strlen(dylibPath) + 1) != KERN_SUCCESS)
+    if (mach_vm_write(task, remoteMemory, (vm_offset_t)dylibPath, (mach_msg_type_number_t)strlen(dylibPath) + 1) != KERN_SUCCESS)
     {
         std::cerr << "Failed to write memory" << std::endl;
         return false;

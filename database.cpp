@@ -13,10 +13,10 @@ Database::Database(const std::string &databasePath) : path(databasePath)
 {
     launcherMethods = {
         {"steam", &Database::extractSteamGames},
-        // {"epic games", &Database::extractEpicGames},
+        {"epic games", &Database::extractEpicGames},
+        // {"ea", &Database::extractEAGames},
         // {"ubisoft", &Database::extractUbisoftGames},
         // {"gog", &Database::extractGOGGames},
-        // {"ea", &Database::extractEAGames},
     };
 
     std::ifstream file(databasePath);
@@ -37,21 +37,16 @@ Database::Database(const std::string &databasePath) : path(databasePath)
         return;
     }
     file.close();
-    std::cout << data.dump() << std::endl;
 }
 
 void Database::extractAllGames()
 {
-    for (const auto launcher : data["launchers"][platform]["launchers"])
+    for (const auto launcher : launcherMethods)
     {
-        if(fs::exists(launcher["path"]))
-        {
-            std::string name = launcher["name"];
-            if (launcherMethods.find(name) != launcherMethods.end())
-            {
-                (this->*launcherMethods[name])(launcher["path"]);
-            }
-        }
+        std::cout << "ello mate" << std::endl;
+        auto launcherOb = data["launchers"][platform][launcher.first];
+        std::cout << launcherOb.dump() << std::endl;
+        (this->*launcher.second)(launcherOb["path"]);
     }
 }
 
@@ -62,7 +57,7 @@ void Database::extractSteamGames(const fs::path &launcherPath)
     {
         for (const auto &entry : fs::directory_iterator(launcherPath))
         {
-            std::cout << entry.path().c_str() << std::endl;
+            std::cout << entry.path() << std::endl;
             if (entry.path().extension() != ".acf")
                 continue;
 
@@ -101,16 +96,67 @@ void Database::extractSteamGames(const fs::path &launcherPath)
             if (!appID.empty() && !installDir.empty() && !name.empty())
             {
                 data["games"].push_back({{"name", name},
-                                         {"appid", appID},
-                                         {"dir", (launcherPath / installDir).string()}});
+                                         {"id", appID},
+                                         {"path", (launcherPath / installDir).string()},
+                                        {"launcher","steam"}});
             }
         }
+        save();
     }
+
     catch (const fs::filesystem_error &e)
     {
         std::cerr << "Filesystem error: " << e.what() << std::endl;
     }
 }
+
+void Database::extractEpicGames(const fs::path &manifestPath)
+{
+    try
+    {
+        for (const auto &entry : fs::directory_iterator(manifestPath))
+        {
+            if (entry.path().extension() != ".item")
+                continue;
+
+            std::ifstream file(entry.path());
+            if (!file.is_open())
+            {
+                std::cerr << "Failed to open Epic manifest: " << entry.path() << std::endl;
+                continue;
+            }
+
+            json manifest;
+            try
+            {
+                file >> manifest;
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+                continue;
+            }
+
+            std::string appID = manifest.value("AppName", "");
+            std::string installDir = manifest.value("InstallLocation", "");
+            if (!appID.empty() && !installDir.empty())
+            {
+                data["games"].push_back({
+                    {"id", appID},
+                    {"path", installDir},
+                    {"name", appID},
+                    {"launcher", "epic games"}
+                });
+            }
+        }
+        save();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error during Epic Games extraction: " << e.what() << std::endl;
+    }
+}
+
 
 json &Database::getData()
 {
