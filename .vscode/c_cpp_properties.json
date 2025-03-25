@@ -1,24 +1,19 @@
-// {
-//     "configurations": [
-//         {
-//             "name": "Linux",
-//             "includePath": [
-//                 "${workspaceFolder}/**",
-//                 "${workspaceFolder}/json/include",
-//                 "/usr/include/qt5/QtNetwork",
-//                 "/usr/include/qt5/QtCore",
-//                 "/usr/include/qt5"
-//             ],
-//             "defines": [],
-//             "cStandard": "c17",
-//             "cppStandard": "gnu++17",
-//             "intelliSenseMode": "linux-gcc-x64"
-//         }
-//     ],
-//     "version": 4
-// }
 {
     "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/json/include",
+                "/usr/include/qt5/QtNetwork",
+                "/usr/include/qt5/QtCore",
+                "/usr/include/qt5"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
         {
             "name": "Win32",
             "includePath": [

@@ -4,11 +4,13 @@
 #include <iostream>
 #include <filesystem>
 #include <map>
+#include "platform.h"
+
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-Database::Database(const std::string &databasePath)
+Database::Database(const std::string &databasePath) : path(databasePath)
 {
     launcherMethods = {
         {"steam", &Database::extractSteamGames},
@@ -101,6 +103,7 @@ void Database::extractSteamGames(const fs::path &launcherPath)
                                          {"dir", (launcherPath / installDir).string()}});
             }
         }
+        
     }
     catch (const fs::filesystem_error &e)
     {
@@ -110,4 +113,16 @@ void Database::extractSteamGames(const fs::path &launcherPath)
 
 json &Database::getData(){
     return data;
+}
+
+
+void Database::save(){
+    std::ofstream file(path);
+        if(!file.is_open())
+        {
+            std::cerr << "Failed to open database file" << std::endl;
+            return;
+        }
+    file << data.dump(4);
+    file.close();
 }
