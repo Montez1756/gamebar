@@ -1,9 +1,21 @@
 {
     "games": [],
-    "launchers": [
-        {
-            "name": "steam",
-            "path": "C:\\Program Files (x86)\\Steam\\steamapps"
+    "launchers": {
+        "windows": {
+            "launchers": [
+                {
+                    "name": "steam",
+                    "path": "C:\\Program Files (x86)\\Steam\\steamapps"
+                }
+            ]
+        },
+        "linux":{
+            "launchers":[
+                {
+                    "name":"steam",
+                    "path":""
+                }
+            ]   
         }
-    ]
+    }
 }
