@@ -1,5 +1,5 @@
 #include "database.h"
-#include "app.h"
+// #include "app.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -7,7 +7,7 @@
 
 int main()
 {
-    App app;
+    // App app;
     Database db("database/games.json");
 
     std::ifstream configFile("config.txt");
@@ -28,7 +28,7 @@ int main()
 
     std::string firstLaunch = lines[0];
     size_t pos = firstLaunch.find(":");
-    bool first = (firstLaunch.substr(pos + 1) == "true");
+    bool first = (firstLaunch.substr(pos + 1) != "true");
     if (first)
     {
         lines[0] = "first:true";

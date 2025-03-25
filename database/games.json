@@ -3,11 +3,7 @@
     "launchers": [
         {
             "name": "steam",
-            "path": "C:/Program Files(x86)/Steam/steamapps/common"
-        },
-        {
-            "name":"epic games",
-            "path":"C:/Program Files/Epic Games"
+            "path": "C:\\Program Files (x86)\\Steam\\steamapps"
         }
     ]
 }

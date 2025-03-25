@@ -12,10 +12,10 @@ Database::Database(const std::string &databasePath)
 {
     launcherMethods = {
         {"steam", &Database::extractSteamGames},
-        {"epic games", &Database::extractEpicGames},
-        {"ubisoft", &Database::extractUbisoftGames},
-        {"gog", &Database::extractGOGGames},
-        {"ea", &Database::extractEAGames},
+        // {"epic games", &Database::extractEpicGames},
+        // {"ubisoft", &Database::extractUbisoftGames},
+        // {"gog", &Database::extractGOGGames},
+        // {"ea", &Database::extractEAGames},
     };
 
     std::ifstream file(databasePath);
@@ -36,6 +36,7 @@ Database::Database(const std::string &databasePath)
         return;
     }
     file.close();
+    std::cout << data.dump() << std::endl;
 }
 
 void Database::extractAllGames()
@@ -57,6 +58,7 @@ void Database::extractSteamGames(const fs::path &launcherPath)
     {
         for (const auto &entry : fs::directory_iterator(launcherPath))
         {
+            std::cout << entry.path().c_str() << std::endl;
             if (entry.path().extension() != ".acf")
                 continue;
 
@@ -108,32 +110,4 @@ void Database::extractSteamGames(const fs::path &launcherPath)
 
 json &Database::getData(){
     return data;
-}
-
-int main()
-{
-    Database db("database/games.json");
-
-    std::ifstream configFile("config.txt");
-    if (!configFile.is_open())
-    {
-        std::cerr << "Warning: config.txt not found." << std::endl;
-        return;
-    }
-
-    std::string content;
-    std::getline(configFile, content);
-    configFile.close();
-
-    size_t pos = content.find(":");
-    if (pos != std::string::npos)
-    {
-        bool firstLaunch = (content.substr(pos + 1) == "true");
-        if (firstLaunch)
-        {
-            db.extractAllGames();
-        }
-    }
-    
-    return 0;
 }
