@@ -20,12 +20,12 @@ private:
     void extractEAGames(const fs::path &launcherPath);
     void extractUbisoftGames(const fs::path &launcherPath);
     void extractGOGGames(const fs::path &launcherPath);
-    void save();
     using gameMethod = void (Database::*)(const fs::path&);
     std::map<std::string, gameMethod> launcherMethods;
     
-public:
+    public:
     Database(const std::string &databasePath);
+    void save();
     void extractAllGames();
     json &getData();
 };

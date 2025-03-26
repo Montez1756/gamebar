@@ -43,10 +43,11 @@ void Database::extractAllGames()
 {
     for (const auto launcher : launcherMethods)
     {
-        std::cout << "ello mate" << std::endl;
         auto launcherOb = data["launchers"][platform][launcher.first];
-        std::cout << launcherOb.dump() << std::endl;
-        (this->*launcher.second)(launcherOb["path"]);
+        if(!launcherOb["path"].empty())
+        {
+            (this->*launcher.second)(launcherOb["path"]);
+        }
     }
 }
 
