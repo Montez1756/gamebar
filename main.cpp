@@ -37,7 +37,8 @@ int main()
 {
     // App app;
     Database db("database/games.json");
-
+    
+    //CHANGE TO CHECK IF CONFIG EXISTS FOR FIRST LAUNCH CHECK INSTEAD
     std::ifstream configFile("config.txt");
     if (!configFile.is_open())
     {
@@ -60,12 +61,21 @@ int main()
     if (first)
     {
         lines.push_back("os:" + platform);
-        json j = db.getData();
+        json &j = db.getData();
         for (auto &[launcherName, launcherConfig] : j["launchers"][platform].items())
         {
-            std::cout << launcherName << std::endl;
-            std::cout << launcherConfig.dump() << std::endl;
             std::string path = launcherConfig["path"];
+            if (platform == "linux" && !path.empty() && path.find("~") != std::string::npos)
+            {
+                const char *homeDir = getenv("HOME");
+                if (!homeDir)
+                    throw std::runtime_error("HOME environment variable not set");
+
+                path = path.replace(0,1,homeDir);
+                j["launchers"][platform][launcherName]["path"] = path;
+
+                db.save();
+            }
             if (fs::exists(path))
             {
                 std::string launcherLine = launcherName + ":" + path;
@@ -94,22 +104,23 @@ int main()
     {
         std::cerr << "No games found from launchers" << std::endl;
     }
-    while (true)
-    {
-        std::string input;
+    //Temp run to test
+    // while (true)
+    // {
+    //     std::string input;
 
-        std::cout << "Enter game name: " << std::endl;
-        std::getline(std::cin, input);
-        if (input == "q")
-        {
-            return 0;
-        }
-        else
-        {
-            run(j, input);
-        }
-        // inZOI: Creative Studio
-    }
+    //     std::cout << "Enter game name: " << std::endl;
+    //     std::getline(std::cin, input);
+    //     if (input == "q")
+    //     {
+    //         return 0;
+    //     }
+    //     else
+    //     {
+    //         run(j, input);
+    //     }
+    //     // inZOI: Creative Studio
+    // }
 
     return 0;
 }
