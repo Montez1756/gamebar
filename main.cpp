@@ -8,6 +8,7 @@
 #include "platform.h"
 #include <filesystem>
 #include <cstdlib>
+// #include "gui/gamebargui.h"
 
 namespace fs = std::filesystem;
 
@@ -39,10 +40,11 @@ int main()
     Database db("database/games.json");
     
     //CHANGE TO CHECK IF CONFIG EXISTS FOR FIRST LAUNCH CHECK INSTEAD
+    bool first = fs::exists("config.txt");
     std::ifstream configFile("config.txt");
     if (!configFile.is_open())
     {
-        std::cerr << "Warning: config.txt not found." << std::endl;
+        std::cerr << "Warning: could not open config.txt" << std::endl;
         return -1;
     }
     std::vector<std::string> lines;
@@ -57,7 +59,6 @@ int main()
 
     std::string firstLaunch = lines[0];
     size_t pos = firstLaunch.find(":");
-    bool first = (firstLaunch.substr(pos + 1) != "true");
     if (first)
     {
         lines.push_back("os:" + platform);
@@ -104,6 +105,9 @@ int main()
     {
         std::cerr << "No games found from launchers" << std::endl;
     }
+
+    // Gamebar bar;
+    // bar.loadGames();
     //Temp run to test
     // while (true)
     // {
