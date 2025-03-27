@@ -1,14 +1,13 @@
 #include "database.h"
-// #include "app.h"
+#include "platform.h"
+#include "gui/gamebargui.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include "platform.h"
 #include <filesystem>
 #include <cstdlib>
-// #include "gui/gamebargui.h"
 
 namespace fs = std::filesystem;
 
@@ -38,64 +37,13 @@ int main()
 {
     // App app;
     Database db("database/games.json");
-    
-    //CHANGE TO CHECK IF CONFIG EXISTS FOR FIRST LAUNCH CHECK INSTEAD
-    bool first = fs::exists("config.txt");
-    std::ifstream configFile("config.txt");
-    if (!configFile.is_open())
-    {
-        std::cerr << "Warning: could not open config.txt" << std::endl;
-        return -1;
-    }
-    std::vector<std::string> lines;
-    std::string line;
 
-    while (std::getline(configFile, line))
-    {
-        lines.push_back(line);
-    }
+    bool first = fs::exists("database/config.txt");
 
-    configFile.close();
-
-    std::string firstLaunch = lines[0];
-    size_t pos = firstLaunch.find(":");
     if (first)
     {
-        lines.push_back("os:" + platform);
-        json &j = db.getData();
-        for (auto &[launcherName, launcherConfig] : j["launchers"][platform].items())
-        {
-            std::string path = launcherConfig["path"];
-            if (platform == "linux" && !path.empty() && path.find("~") != std::string::npos)
-            {
-                const char *homeDir = getenv("HOME");
-                if (!homeDir)
-                    throw std::runtime_error("HOME environment variable not set");
-
-                path = path.replace(0,1,homeDir);
-                j["launchers"][platform][launcherName]["path"] = path;
-
-                db.save();
-            }
-            if (fs::exists(path))
-            {
-                std::string launcherLine = launcherName + ":" + path;
-                lines.push_back(launcherLine);
-            }
-        }
-        // lines[0] = "first:true";
-        std::ofstream configFile("config.txt");
-        if (!configFile.is_open())
-        {
-            std::cerr << "Warning: Failed to open config.txt" << std::endl;
-            return -1;
-        }
-        for (const auto &line : lines)
-        {
-            configFile << line << "\n";
-        }
-        configFile.close();
-
+        std::ofstream configFile("database/config.txt");
+        configFile << "THIS FILE ALLOWS THE PROGRAM TO KNOW THAT IT HAS BEEN RAN AND DOESN'T NEED TO INITIALLIZE AGAIN (DON'T DELETE)";
         db.extractAllGames();
     }
 
@@ -106,9 +54,9 @@ int main()
         std::cerr << "No games found from launchers" << std::endl;
     }
 
-    // Gamebar bar;
-    // bar.loadGames();
-    //Temp run to test
+    Gamebar bar;
+    bar.loadGames();
+    // Temp run to test
     // while (true)
     // {
     //     std::string input;

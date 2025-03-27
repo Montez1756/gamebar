@@ -1,1 +1,3 @@
 first:false
+os:linux
+steam:/home/montez0516/.local/share/Steam/steamapps

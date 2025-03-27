@@ -5,14 +5,15 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/json/include",
-                "/usr/include/x86_64-linux-gnu/qt5/QtNetwork",
-                "/usr/include/x86_64-linux-gnu/qt5/QtCore",
-                "/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-                "/usr/include/x86_64-linux-gnu/qt5",
-                "/usr/include/x86_64-linux-gnu/qt5/QtGui"
-                // "/usr/include/qt5/QtNetwork",
-                // "/usr/include/qt5/QtCore",
-                // "/usr/include/qt5"
+                // "/usr/include/x86_64-linux-gnu/qt5/QtNetwork",
+                // "/usr/include/x86_64-linux-gnu/qt5/QtCore",
+                // "/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+                // "/usr/include/x86_64-linux-gnu/qt5",
+                // "/usr/include/x86_64-linux-gnu/qt5/QtGui"
+                "/usr/include/qt5/QtWidgets",
+                "/usr/include/qt5/QtGui",
+                "/usr/include/qt5/QtCore",
+                "/usr/include/qt5"
             ],
             "defines": [],
             "cStandard": "c17",
@@ -25,7 +26,7 @@
                 "${workspaceFolder}/**",
                 "C:/msys64/mingw64/include/QtWidgets",
                 "C:/msys64/mingw64/include/QtCore",
-                "C:/msys64/mingw64/include/QtSql",
+                "C:/msys64/mingw64/include/QtGui",
                 "${workspaceFolder}/json/include"
             ],
             "defines": [

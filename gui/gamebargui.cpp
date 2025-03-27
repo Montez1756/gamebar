@@ -6,10 +6,14 @@
 #include <QWidget>
 #include <QLabel>
 #include "nlohmann/json.hpp"
-// #include <windows.h>
+#include <windows.h>
 #include <QIcon>
 #include <QVBoxLayout>
 #include <QPixmap>
+#include <QImage>
+#include <QFile>
+#include <QPainter>
+#include <QPaintEngine>
 
 Gamebar::Gamebar() : db(new Database("./database/games.db"))
 {
@@ -21,46 +25,116 @@ void Gamebar::loadGames()
     json &j = db->getData();
     for (auto game : j["games"])
     {
-        games.push_back(new Game(j["launchers"][platform][game["launcher"]], game));
+        if (game.contains("launcher"))
+        {
+            games.push_back(new Game(j["launchers"][platform][game["launcher"]], game));
+        }
+        else{
+            games.push_back(new Game(game));
+        }
     }
 }
 
-Game::Game(json &launcherObject, json &gameObject)
+Game::Game(json &launcherObject, json &gameObject) : launcherOb(&launcherObject), gameOb(&gameObject)
 {
-    displayName = gameObject["name"];
-    exePath = gameObject["exe"];
-    launchCMD = launcherObject["launch_cmd"];
-    iconPath = gameObject["exe"];
-    layout = new QVBoxLayout();
-    label = new QLabel(displayName.c_str());
+    initGame();
+}
+Game::Game(json &gameObject) : gameOb(&gameObject)
+{
+    initGame();
+}
+/*
+/////////////////////////////
+CHANGE DATABASE GAME EXTRACTORS TO MATCH THIS
+////////////////////////////
+*/
+void Game::initGame(){
+    displayName = gameOb->at("name");
+    exePath = gameOb->at("exe");
+    if(launcherOb != nullptr)
+    {
+        launchCMD = launcherOb->at("launch_cmd");
+    }
+    else{
+        launchCMD = exePath;
+    }
+    iconPath = gameOb->at("icon");
+    layout = new QVBoxLayout(this);
+    nameLabel = new QLabel(displayName.c_str(), this);
+    iconLabel = new QLabel(this);
 
     if (iconPath != "" && iconPath.substr(iconPath.size() - 4) == ".exe")
     {
-        icon = new QIcon(iconPath.c_str());
+        // icon = new QIcon(iconPath.c_str());
+        iconLabel->setPixmap(QPixmap(exePath.c_str()));
+    }
+    else if(iconPath.substr(iconPath.size() - 4) == ".exe")
+    {
+        iconLabel->setPixmap(extractWindowsIconAsPixmap(exePath));
     }
     else
     {
-        icon = getIcon();
+        iconLabel->setPixmap(QPixmap("gui/images/defaults/default_icon.png"));
     }
 
-    layout->addWidget(new QLabel(icon));
-    layout->addWidget(label);
+    layout->addWidget(iconLabel);
+    layout->addWidget(nameLabel);
     setLayout(layout);
 }
 
-QIcon *Game::getIcon()
+QPixmap hiconToQPixmap(HICON hIcon)
 {
-    return new extractWindowsIcon(exePath);
-}
-QIcon Game::extractWindowsIcon(const std::string &exe)
-{
-    HICON hIcon = ExtractIcon(NULL, exePath.c_str(), 0); // Get the first icon
-    if (hIcon)
-    {
-        QPixmap pixmap = QPixmap::fromWinHICON(hIcon); // Convert HICON to QPixmap
-        DestroyIcon(hIcon);                            // Don't forget to destroy the icon when done
-        return QIcon(pixmap);                          // Convert QPixmap to QIcon
-    }
-    return QIcon(); // Return an empty QIcon if no icon was found
+    if (!hIcon)
+        return QPixmap("gui/images/defaults/default_icon.png");
+
+    ICONINFO iconInfo;
+    if (!GetIconInfo(hIcon, &iconInfo))
+        return QPixmap("gui/images/defaults/default_icon.png");
+
+    // Get the bitmap info
+    BITMAP bmp;
+    GetObject(iconInfo.hbmColor, sizeof(BITMAP), &bmp);
+    int width = bmp.bmWidth;
+    int height = bmp.bmHeight;
+
+    // Create QImage
+    QImage image(width, height, QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    // Get HDC
+    HDC hdc = GetDC(NULL);
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, iconInfo.hbmColor);
+
+    // Copy bitmap data into QImage
+    BITMAPINFOHEADER bi;
+    memset(&bi, 0, sizeof(bi));
+    bi.biSize = sizeof(BITMAPINFOHEADER);
+    bi.biWidth = width;
+    bi.biHeight = -height; // Negative to keep the correct orientation
+    bi.biPlanes = 1;
+    bi.biBitCount = 32;
+    bi.biCompression = BI_RGB;
+
+    GetDIBits(hdc, iconInfo.hbmColor, 0, height, image.bits(), (BITMAPINFO *)&bi, DIB_RGB_COLORS);
+
+    // Clean up
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+    ReleaseDC(NULL, hdc);
+    DeleteObject(iconInfo.hbmColor);
+    DeleteObject(iconInfo.hbmMask);
+    DestroyIcon(hIcon);
+
+    return QPixmap::fromImage(image);
 }
 
+QPixmap Game::extractWindowsIconAsPixmap(const std::string &exePath)
+{
+    HICON hIcon;
+    if (ExtractIconExA(exePath.c_str(), 0, &hIcon, nullptr, 1) > 0 && hIcon)
+    {
+        return hiconToQPixmap(hIcon);
+    }
+    return QPixmap("gui/images/defaults/default_icon.png");
+}
