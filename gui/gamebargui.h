@@ -2,14 +2,15 @@
 #define GUI_H
 
 #include "platform.h"
+#include "database.h"
 #include <QObject>
 #include <QWidget>
 #include <string>
 #include <vector>
 #include <QMainWindow>
-#include "database.h"
 #include <QVBoxLayout>
 #include "nlohmann/json.hpp"
+#include <windows.h>
 
 using json = nlohmann::json;
 
@@ -34,11 +35,16 @@ private:
     std::string iconPath;
     std::string exePath;
     QVBoxLayout *layout;
-    QIcon *icon;
-    QLabel *label;
+    QLabel *iconLabel;
+    QLabel *nameLabel;
+    json *launcherOb = nullptr;
+    json *gameOb;
 public:
     Game(json &launcherObject, json &gameObject);
+    Game(json &gameObject);
+    void initGame();
     QIcon *getIcon();
-    QIcon extractWindowsIcon(const std::string &exe);
+    QPixmap hiconToQPixmap(HICON hIcon);
+    QPixmap extractWindowsIconAsPixmap(const std::string& exePath);
 };
 #endif
