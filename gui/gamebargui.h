@@ -12,7 +12,6 @@
 #include "nlohmann/json.hpp"
 #include <windows.h>
 
-using json = nlohmann::json;
 
 class Gamebar : public QObject
 {
