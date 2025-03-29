@@ -1,6 +1,6 @@
 #include "database.h"
 #include "platform.h"
-#include "gui/gamebargui.h"
+#include "gamebargui.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <cstdlib>
+#include <QApplication>
 
 namespace fs = std::filesystem;
 
@@ -33,14 +34,15 @@ void run(json &j, std::string gameName)
     std::cerr << "Could not find game " << gameName << std::endl;
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    // App app;
+    QApplication app(argc, argv);
+
     Database db("database/games.json");
 
     bool first = fs::exists("database/config.txt");
 
-    if (first)
+    if (!first)
     {
         std::ofstream configFile("database/config.txt");
         configFile << "THIS FILE ALLOWS THE PROGRAM TO KNOW THAT IT HAS BEEN RAN AND DOESN'T NEED TO INITIALLIZE AGAIN (DON'T DELETE)";
@@ -53,8 +55,8 @@ int main()
     {
         std::cerr << "No games found from launchers" << std::endl;
     }
-
-    Gamebar bar;
+    std::cout << "Loading gamebar" << std::endl;
+    Gamebar bar(db);
     bar.loadGames();
     // Temp run to test
     // while (true)
@@ -74,5 +76,5 @@ int main()
     //     // inZOI: Creative Studio
     // }
 
-    return 0;
+    return app.exec();
 }
