@@ -1,0 +1,14 @@
+#mainWindow {
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+#pageButton{
+    color: white;
+    border-radius: 10px;
+    background-color: black;
+    padding: 1em;
+    font-weight: bold;
+    font-size: larger;
+    qproperty-iconSize: 32px 32px;
+}

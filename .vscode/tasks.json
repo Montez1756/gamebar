@@ -44,7 +44,8 @@
                 "-g",
                 "main.cpp",
                 "database.cpp",
-                "gamebargui.cpp",
+                "gui.cpp",
+                "moc_gui.cpp",
                 "-I${workspaceFolder}/json/include",
                 "-LC:/msys64/mingw64/lib",
                 "-IC:/msys64/mingw64/include/QtGui",
@@ -55,6 +56,7 @@
                 "-lQt5Widgets",
                 "-lQt5Core",
                 "-lgdi32",
+                "-lshell32",
                 "-o",
                 "gamebar.exe"
             ],

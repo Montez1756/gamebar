@@ -1,6 +1,6 @@
 #include "database.h"
 #include "platform.h"
-#include "gamebargui.h"
+#include "gui.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -56,8 +56,7 @@ int main(int argc, char **argv)
         std::cerr << "No games found from launchers" << std::endl;
     }
     std::cout << "Loading gamebar" << std::endl;
-    Gamebar bar(db);
-    bar.loadGames();
+    Gui gui;
     // Temp run to test
     // while (true)
     // {
